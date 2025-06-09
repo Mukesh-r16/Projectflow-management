@@ -171,3 +171,81 @@ For support and questions:
 ---
 
 **ProjectFlow Management** - Streamline your team's productivity with intuitive project management tools.
+
+
+
+# ProjectFlow Management
+
+A comprehensive project management application inspired by Monday.com, built with modern web technologies.
+
+## Features
+
+- **Kanban Board**: Drag-and-drop task management with status columns
+- **Task Management**: Create, edit, and assign tasks with priorities and due dates
+- **Dashboard Views**: Personal tasks, all tasks, and board-specific views
+- **Real-time Updates**: Instant UI updates with optimistic caching
+- **Advanced Filtering**: Filter and sort tasks by status, priority, and more
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+
+## Tech Stack
+
+- **Frontend**: React 18, TypeScript, Tailwind CSS
+- **Backend**: Express.js, Node.js
+- **Database**: Drizzle ORM (MySQL/PostgreSQL ready)
+- **State Management**: TanStack React Query
+- **Build Tool**: Vite
+- **UI Components**: Shadcn/ui, Radix UI
+
+## Getting Started
+
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+2. **Start development server**:
+   ```bash
+   npm run dev
+   ```
+
+3. **Open browser**:
+   Navigate to `http://localhost:5000`
+
+## Project Structure
+
+```
+├── client/src/          # Frontend React application
+│   ├── components/      # Reusable UI components
+│   ├── hooks/          # Custom React hooks
+│   ├── lib/            # Utility functions
+│   └── pages/          # Page components
+├── server/             # Backend Express server
+├── shared/             # Shared types and schemas
+└── configuration files
+```
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run db:push` - Push database schema changes
+
+## Database Setup
+
+The application uses in-memory storage by default for quick setup. To use a persistent database:
+
+1. Set up PostgreSQL or MySQL
+2. Update database configuration in `server/db.ts`
+3. Run `npm run db:push` to apply schema
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details
