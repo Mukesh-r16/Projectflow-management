@@ -41,9 +41,13 @@ export const timeEntries = mysqlTable("time_entries", {
   taskId: int("task_id").notNull(),
   userId: int("user_id").notNull(),
   description: varchar("description", { length: 1000 }),
-  hours: int("hours").notNull(),
+  hours: int("hours").notNull(), // stored as minutes for precision
+  startTime: timestamp("start_time"),
+  endTime: timestamp("end_time"),
   date: varchar("date", { length: 10 }).notNull(),
+  entryType: varchar("entry_type", { length: 20 }).notNull().default("manual"), // manual, timer
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({
