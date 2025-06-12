@@ -1,31 +1,63 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useAllTasks } from "@/hooks/use-tasks";
+import { useUsers } from "@/hooks/use-boards";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Calendar, Clock, TrendingUp, BarChart } from "lucide-react";
-import { format, parseISO, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, addWeeks, subWeeks } from "date-fns";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar, Clock, TrendingUp, BarChart, ChevronLeft, ChevronRight, Filter, GitBranch, Play } from "lucide-react";
+import { format, parseISO, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, addWeeks, subWeeks, differenceInDays, startOfDay, endOfDay, addDays, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 import type { TaskWithAssignee } from "@shared/schema";
 import Header from "@/components/layout/header";
 import Sidebar from "@/components/layout/sidebar";
 
 export default function Timeline() {
-  const [currentWeek, setCurrentWeek] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [viewType, setViewType] = useState<'week' | 'month' | 'gantt'>('week');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterAssignee, setFilterAssignee] = useState<string>('all');
+  
   const { data: tasks = [], isLoading } = useAllTasks();
+  const { data: users = [] } = useUsers();
 
-  const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 }); // Monday
-  const weekEnd = endOfWeek(currentWeek, { weekStartsOn: 1 });
-  const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd });
+  // Calculate date ranges based on view type
+  const dateRange = useMemo(() => {
+    if (viewType === 'week') {
+      const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
+      const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
+      return { start: weekStart, end: weekEnd, days: eachDayOfInterval({ start: weekStart, end: weekEnd }) };
+    } else if (viewType === 'month') {
+      const monthStart = startOfMonth(currentDate);
+      const monthEnd = endOfMonth(currentDate);
+      return { start: monthStart, end: monthEnd, days: eachDayOfInterval({ start: monthStart, end: monthEnd }) };
+    } else {
+      // Gantt view - show 3 months
+      const start = startOfMonth(addDays(currentDate, -30));
+      const end = endOfMonth(addDays(currentDate, 60));
+      return { start, end, days: eachDayOfInterval({ start, end }) };
+    }
+  }, [currentDate, viewType]);
+
+  // Filter tasks based on current filters
+  const filteredTasks = useMemo(() => {
+    return tasks.filter(task => {
+      if (filterStatus !== 'all' && task.status !== filterStatus) return false;
+      if (filterAssignee !== 'all' && task.assigneeId?.toString() !== filterAssignee) return false;
+      return true;
+    });
+  }, [tasks, filterStatus, filterAssignee]);
 
   const getTasksForDate = (date: Date) => {
-    return tasks.filter(task => 
+    return filteredTasks.filter(task => 
       task.dueDate && isSameDay(new Date(task.dueDate), date)
     );
   };
 
   const getTasksByDateRange = (startDate: Date, endDate: Date) => {
-    return tasks.filter(task => {
+    return filteredTasks.filter(task => {
       if (!task.dueDate) return false;
       const taskDate = new Date(task.dueDate);
       return taskDate >= startDate && taskDate <= endDate;
